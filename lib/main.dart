@@ -120,19 +120,19 @@
 //     );
 //   }
 // }
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/auth/welcome_screen.dart';
 import 'screens/events/discover_events_screen.dart';
 import 'screens/main_nav_screen.dart';
+import 'screens/admin/admin_pending_approvals_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyCityEventsApp());
 }
 
@@ -142,8 +142,8 @@ class MyCityEventsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-       debugShowCheckedModeBanner: false,
-       home: const WelcomeScreen(),
-      ); 
+      debugShowCheckedModeBanner: false,
+      home: WelcomeScreen(),
+    );
   }
 }

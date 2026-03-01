@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'interests_screen.dart';
 import 'login_screen.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -97,13 +97,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Account created ✅")),
       );
-
-      // مؤقتًا: يرجع للّوغن (بعدين نغيرها لهوم/صفحة بعد التسجيل)
-      Navigator.pushAndRemoveUntil(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+        MaterialPageRoute(builder: (_) => const InterestsScreen()),
+        );
+
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +177,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          "assets/logo.png",
+                          "assets/logo.png.jpg",
                           fit: BoxFit.contain,
                           errorBuilder: (_, __, ___) => const Icon(
                             Icons.location_city,

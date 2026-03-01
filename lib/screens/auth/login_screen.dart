@@ -4,7 +4,7 @@ import 'reset_password_screen.dart';
 import 'create_account_email.dart';
 import '../events/discover_events_screen.dart';
 import '../main_nav_screen.dart';
-
+import '../organizer/organizer_home.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,32 +28,43 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color primaryColor = Color(0xFFFF6A00);
   static const Color backgroundColor = Color(0xFFF5F5F5);
 
-  //  Login function
+  // ✅ Login function (with role routing)
   Future<void> login() async {
     setState(() => isLoading = true);
 
     try {
-      // 1) Backend login (Firebase Auth) عبر AuthService
+      // 1) Firebase Auth login
       await _authService.login(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
 
+      // 2) Get role from Firestore
+      final role = await _authService.getCurrentUserRole();
+
       if (!mounted) return;
 
-      // 2) After login -> go to Discover Events
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainNavScreen()),
+      // 3) Navigate based on role
+      final nextPage = role == "organizer"
+          ? const OrganizerHomeScreen()
+          : const MainNavScreen();
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => nextPage),
+        (route) => false,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login successful")),
-      );
+      // 4) Optional success message (after navigation)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Login successful ($role)")));
+      });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed: $e")),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login failed: $e")));
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -74,7 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             const Text(
               "myCity Event",
               style: TextStyle(
@@ -83,17 +93,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 30),
-
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: const BoxDecoration(
                   color: backgroundColor,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(30),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,16 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 6),
-
                     const Text(
                       "Sign in to continue",
                       style: TextStyle(color: Colors.black54),
                     ),
-
                     const SizedBox(height: 25),
-
                     const Text("Email"),
                     const SizedBox(height: 6),
                     TextField(
@@ -130,9 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
                     const Text("Password"),
                     const SizedBox(height: 6),
                     TextField(
@@ -148,9 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -168,9 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -194,9 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             : const Text("Sign In"),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
                     Center(
                       child: TextButton(
                         onPressed: () {
